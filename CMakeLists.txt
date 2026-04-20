@@ -14,7 +14,15 @@ target_compile_features(slim INTERFACE cxx_std_23)
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
 if(SLIM_BUILD_TESTS)
-    find_package(Catch2 3 REQUIRED)
+	include(FetchContent)
+
+	FetchContent_Declare(
+    	Catch2
+    	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    	GIT_TAG v3.5.0
+	)
+
+	FetchContent_MakeAvailable(Catch2)
 
     enable_testing()
 
