@@ -28,6 +28,9 @@ if(SLIM_BUILD_TESTS)
 
     add_executable(slim_tests
         tests/slim_tests.cpp
+        tests/anyvalue_tests.cpp
+        tests/errorinfo_tests.cpp
+        tests/slimmap_tests.cpp
     )
 
     target_link_libraries(slim_tests
@@ -39,4 +42,5 @@ if(SLIM_BUILD_TESTS)
     include(CTest)
     include(Catch)
     catch_discover_tests(slim_tests)
+
 endif()

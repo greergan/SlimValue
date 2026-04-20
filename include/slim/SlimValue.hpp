@@ -33,17 +33,23 @@ namespace slim {
 		public:
 			AnyValue() = default;
 
-            template <typename _T>
-            requires std::constructible_from<Variant, std::decay_t<_T>>AnyValue(_T&& _v) {
-                using U = std::decay_t<_T>;
+			template <typename _T>
+			AnyValue(_T&& _v) {
+				using U = std::decay_t<_T>;
 
-	            if constexpr (std::is_same_v<U, std::string_view>) {
-		            __value = std::string(_v);
-	            }
-	            else {
-		            __value = std::forward<_T>(_v);
-	            }
-            }
+				if constexpr (std::is_same_v<U, std::string_view>) {
+					__value = std::string(_v);
+				}
+				else if constexpr (std::is_constructible_v<std::string, U>) {
+					__value = std::string(_v);
+				}
+				else if constexpr (std::constructible_from<Variant, U>) {
+					__value = std::forward<_T>(_v);
+				}
+/* 				else {
+					static_assert(sizeof(U) == 0, "Unsupported AnyValue type");
+				} */
+			}
 
 			explicit operator bool() const {
 				return std::visit([](auto&& _v)-> bool {
@@ -239,36 +245,36 @@ namespace slim {
 		public:
 			SlimMap() = default;
 
-			AnyValue& create(const std::string& _key) {
-				return __map[_key];
+			AnyValue& create(std::string_view _key) {
+				return __map[std::string(_key)];
 			}
 
 			std::unordered_map<std::string, AnyValue>& get() {
 				return __map;
 			}
 
-			AnyValue& get(const std::string& _key) {
-				return __map.at(_key);
+			AnyValue& get(std::string_view _key) {
+				return __map.at(std::string(_key));
 			}
 
-			const AnyValue& get(const std::string& _key) const {
-				return __map.at(_key);
+			const AnyValue& get(std::string_view _key) const {
+				return __map.at(std::string(_key));
 			}
 
-			bool has(const std::string& _key) const {
-				return __map.contains(_key);
+			bool has(std::string_view _key) const {
+				return __map.contains(std::string(_key));
 			}
 
-			void set(const std::string& _key, const AnyValue& _value) {
-				__map[_key] = _value;
+			void set(std::string_view _key, const AnyValue& _value) {
+				__map[std::string(_key)] = _value;
 			}
 
-			void set(const std::string& _key, AnyValue&& _value) {
-				__map[_key] = std::move(_value);
+			void set(std::string_view _key, AnyValue&& _value) {
+				__map[std::string(_key)] = std::move(_value);
 			}
 
-			void remove(const std::string& _key) {
-				__map.erase(_key);
+			void remove(std::string_view _key) {
+				__map.erase(std::string(_key));
 			}
 
 			std::size_t size() const {
@@ -319,7 +325,14 @@ struct SlimMultiMap {
 
 		template <typename _T>
 		void set(std::string_view _key, _T&& _value) {
-			__map.emplace(std::string(_key), AnyValue(std::forward<_T>(_value)));
+			using U = std::decay_t<_T>;
+
+			if constexpr (std::is_same_v<U, std::string_view>) {
+				__map.emplace(std::string(_key), AnyValue(std::string(_value)));
+			}
+			else {
+				__map.emplace(std::string(_key), AnyValue(std::forward<_T>(_value)));
+			}
 		}
 
 		void remove(std::string_view _key) {
@@ -384,34 +397,34 @@ struct SlimMultiMap {
 				return __value != _rhs;
 			}
 
-			SlimMap& get_map(const std::string& _key) {
+			SlimMap& get_map(std::string_view _key) {
 				if(!__maps) {
 					__maps.emplace();
 				}
-				return (*__maps)[_key];
+				return (*__maps)[std::string(_key)];
 			}
 
-			SlimMultiMap& get_multi_map(const std::string& _key) {
+			SlimMultiMap& get_multi_map(std::string_view _key) {
 				if(!__multi_maps) {
 					__multi_maps.emplace();
 				}
-				return (*__multi_maps)[_key];
+				return (*__multi_maps)[std::string(_key)];
 			}
 
 			bool has_maps() const {
 				return __maps.has_value();
 			}
 
-			bool has_map(const std::string& _key) const {
-				return __maps && __maps->contains(_key);
+			bool has_map(std::string_view _key) const {
+				return __maps && __maps->contains(std::string(_key));
 			}
 
 			bool has_multi_maps() const {
 				return __multi_maps.has_value();
 			}
 
-			bool has_multi_map(const std::string& _key) const {
-				return __multi_maps && __multi_maps->contains(_key);
+			bool has_multi_map(std::string_view _key) const {
+				return __multi_maps && __multi_maps->contains(std::string(_key));
 			}
 
 			void set_error(const ErrorInfo& _error) {
