@@ -1,5 +1,5 @@
-#ifndef __SLIM__HPP
-#define __SLIM__HPP
+#ifndef __SLIM__VALUE__HPP
+#define __SLIM__VALUE__HPP
 #include <any>
 #include <optional>
 #include <string>
@@ -280,59 +280,59 @@ namespace slim {
 			}
 	};
 
-	struct SlimMultiMap {
-		private:
-			std::unordered_multimap<std::string, AnyValue> __map;
+struct SlimMultiMap {
+	private:
+		std::unordered_multimap<std::string, AnyValue> __map;
 
-		public:
-			SlimMultiMap() = default;
+	public:
+		SlimMultiMap() = default;
 
-			AnyValue& create(const std::string& _key) {
-				return __map.emplace(_key, AnyValue{})->second;
-			}
+		AnyValue& create(std::string_view _key) {
+			return __map.emplace(std::string(_key), AnyValue{})->second;
+		}
 
-			std::unordered_multimap<std::string, AnyValue>& get() {
-				return __map;
-			}
+		std::unordered_multimap<std::string, AnyValue>& get() {
+			return __map;
+		}
 
-			std::pair<
-				std::unordered_multimap<std::string, AnyValue>::iterator,
-				std::unordered_multimap<std::string, AnyValue>::iterator
-			> get(const std::string& _key) {
-				return __map.equal_range(_key);
-			}
+		std::pair<
+			std::unordered_multimap<std::string, AnyValue>::iterator,
+			std::unordered_multimap<std::string, AnyValue>::iterator
+		> get(std::string_view _key) {
+			return __map.equal_range(std::string(_key));
+		}
 
-			std::pair<
-				std::unordered_multimap<std::string, AnyValue>::const_iterator,
-				std::unordered_multimap<std::string, AnyValue>::const_iterator
-			> get(const std::string& _key) const {
-				return __map.equal_range(_key);
-			}
+		std::pair<
+			std::unordered_multimap<std::string, AnyValue>::const_iterator,
+			std::unordered_multimap<std::string, AnyValue>::const_iterator
+		> get(std::string_view _key) const {
+			return __map.equal_range(std::string(_key));
+		}
 
-			bool has(const std::string& _key) const {
-				return __map.find(_key) != __map.end();
-			}
+		bool has(std::string_view _key) const {
+			return __map.find(std::string(_key)) != __map.end();
+		}
 
-			void set(const std::string& _key, AnyValue&& _value) {
-				__map.emplace(_key, std::move(_value));
-			}
+		void set(std::string_view _key, AnyValue&& _value) {
+			__map.emplace(std::string(_key), std::move(_value));
+		}
 
-			template <typename _T>
-			void set(const std::string& _key, _T&& _value) {
-				__map.emplace(_key, AnyValue(std::forward<_T>(_value)));
-			}
+		template <typename _T>
+		void set(std::string_view _key, _T&& _value) {
+			__map.emplace(std::string(_key), AnyValue(std::forward<_T>(_value)));
+		}
 
-			void remove(const std::string& _key) {
-				__map.erase(_key);
-			}
+		void remove(std::string_view _key) {
+			__map.erase(std::string(_key));
+		}
 
-			std::size_t size() const {
-				return __map.size();
-			}
+		std::size_t size() const {
+			return __map.size();
+		}
 
-			void clear() {
-				__map.clear();
-			}
+		void clear() {
+			__map.clear();
+		}
 	};
 
 	struct SlimValue {
