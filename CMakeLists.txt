@@ -1,15 +1,79 @@
 cmake_minimum_required(VERSION 3.20)
+project(SlimValue VERSION 1.0.0 LANGUAGES CXX)
 
-project(SlimValue LANGUAGES CXX)
+include(GNUInstallDirs)
 
 add_library(slim INTERFACE)
 
 target_include_directories(slim
     INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_compile_features(slim INTERFACE cxx_std_23)
+
+# install targets
+install(TARGETS slim EXPORT SlimTargets)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT SlimTargets
+        FILE SlimTargets.cmake
+        NAMESPACE Slim::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SlimValue)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfig.cmake"
+"include(\"\${CMAKE_CURRENT_LIST_DIR}/SlimTargets.cmake\")\n")
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SlimValue
+)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/slimvalue.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/slimvalue.pc"
+    @ONLY
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/slimvalue.pc"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
+set(CPACK_GENERATOR "DEB;RPM")
+
+set(CPACK_PACKAGE_NAME "slimvalue")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "you@example.com")
+
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "you")
+set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
+
+set(CPACK_RPM_PACKAGE_NAME "slimvalue")
+set(CPACK_RPM_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_RPM_PACKAGE_RELEASE "1")
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
+set(CPACK_RPM_PACKAGE_SUMMARY "SlimValue header-only C++ library")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(CPACK_RPM_PACKAGE_REQUIRES "")
+
+include(CPack)
 
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
