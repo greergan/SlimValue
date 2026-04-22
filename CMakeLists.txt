@@ -75,6 +75,7 @@ if(SLIM_BUILD_TESTS)
         ${slimvaluesrc_SOURCE_DIR}/tests/anyvalue_tests.cpp
         ${slimvaluesrc_SOURCE_DIR}/tests/errorinfo_tests.cpp
         ${slimvaluesrc_SOURCE_DIR}/tests/slimmap_tests.cpp
+        ${slimvaluesrc_SOURCE_DIR}/tests/slimvalue_tests.cpp
     )
 
     target_link_libraries(slim_tests
