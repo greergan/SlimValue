@@ -54,7 +54,7 @@ docker build -t slimvalue-package-maker .
 
 Build packages
 ```
-docker run -it --rm -v $PWD:/dist slimvalue-package-maker bash -c "cd /workspace && make packages"
+docker run -it --rm -v $PWD:/dist slimvalue-package-maker bash -c "cd /workspace && make packages LOCAL_SRC=OFF DIST_DIR=/dist"
 ```
 
 ### Build
