@@ -1,13 +1,14 @@
 BUILD_DIR := build
 INSTALL_PREFIX ?= /usr/local
 CMAKE := cmake
+DIST_DIR ?= .
 
-.PHONY: all configure build install test deb rpm release clean
+.PHONY: all configure build install test deb rpm packages clean
 
 all: build
 
 configure:
-	$(CMAKE) -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+	$(CMAKE) -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) -DCPACK_OUTPUT_FILE_PREFIX=$(DIST_DIR)
 
 build: configure
 	$(CMAKE) --build $(BUILD_DIR)
@@ -19,13 +20,14 @@ test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure --verbose
 	$(BUILD_DIR)/slim_tests
 
-deb: build
+deb: build test
 	cd $(BUILD_DIR) && cpack -G DEB
 
-rpm: build
+rpm: build test
 	cd $(BUILD_DIR) && cpack -G RPM
 
-release: deb rpm
+packages: test
+	cd $(BUILD_DIR) && for f in DEB RPM; do cpack -G $$f; done
 
 clean:
 	rm -rf $(BUILD_DIR)
