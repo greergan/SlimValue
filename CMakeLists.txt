@@ -9,7 +9,7 @@ set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local SlimValue source instead of 
 
 if(SLIM_USE_LOCAL_SOURCE)
     set(GIT_TAG 0.0.0)
-    set(SLIMVALUE_GIT_HASH "non-local")
+    set(SLIMVALUE_GIT_HASH "none")
 else()
     execute_process(
         COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
