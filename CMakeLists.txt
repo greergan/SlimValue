@@ -140,6 +140,6 @@ set(CPACK_RPM_PACKAGE_RELEASE "1")
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
 set(CPACK_RPM_PACKAGE_SUMMARY "SlimValue header-only C++ library")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE "all")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "noarch")
 
 include(CPack)
