@@ -1,5 +1,4 @@
-#ifndef __SLIM__VALUE__HPP
-#define __SLIM__VALUE__HPP
+#pragma once
 #include <any>
 #include <optional>
 #include <string>
@@ -479,4 +478,3 @@ struct SlimMultiMap {
 			}
 	};
 }
-#endif

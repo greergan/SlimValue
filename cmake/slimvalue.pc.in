@@ -6,5 +6,5 @@ libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
 Name: SlimValue
 Description: SlimValue header-only C++ library
 Version: @PROJECT_VERSION@
-Cflags: -I${includedir}
+Cflags: -I${includedir} -std=c++@SLIM_CXX_STANDARD@
 Libs:

@@ -55,6 +55,7 @@ target_include_directories(slim
 )
 
 target_compile_features(slim INTERFACE cxx_std_23)
+set(SLIM_CXX_STANDARD 23)
 
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
