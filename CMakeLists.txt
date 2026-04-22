@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 
 include(FetchContent)
 
-# ------------------------------------------------------------
-# Resolve latest tag (remote)
-# ------------------------------------------------------------
 execute_process(
     COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
     OUTPUT_VARIABLE TAGS_RAW
@@ -19,9 +16,6 @@ if(NOT GIT_TAG)
     set(GIT_TAG main)
 endif()
 
-# ------------------------------------------------------------
-# Fetch source ONLY (no upstream CMake execution)
-# ------------------------------------------------------------
 FetchContent_Declare(
     SlimValueSrc
     GIT_REPOSITORY https://github.com/greergan/SlimValue.git
@@ -34,9 +28,6 @@ include(CMakePackageConfigHelpers)
 
 FetchContent_Populate(SlimValueSrc)
 
-# ------------------------------------------------------------
-# Version header generation (SlimValue.hpp)
-# ------------------------------------------------------------
 set(SLIMVALUE_VERSION ${GIT_TAG})
 
 execute_process(
@@ -49,14 +40,11 @@ execute_process(
 set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
 
 configure_file(
-    "${slimvaluesrc_SOURCE_DIR}/include/SlimValue.hpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/include/SlimValue.hpp"
+    "${slimvaluesrc_SOURCE_DIR}/include/slim/SlimValue.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/slim/SlimValue.hpp"
     @ONLY
 )
 
-# ------------------------------------------------------------
-# Library (wrapper interface target)
-# ------------------------------------------------------------
 add_library(slim INTERFACE)
 
 target_include_directories(slim
@@ -68,9 +56,6 @@ target_include_directories(slim
 
 target_compile_features(slim INTERFACE cxx_std_23)
 
-# ------------------------------------------------------------
-# Tests (your control, not upstream)
-# ------------------------------------------------------------
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
 if(SLIM_BUILD_TESTS)
@@ -100,13 +85,12 @@ if(SLIM_BUILD_TESTS)
     catch_discover_tests(slim_tests)
 endif()
 
-# ------------------------------------------------------------
-# Install / Packaging
-# ------------------------------------------------------------
 install(TARGETS slim EXPORT SlimTargets)
 
-install(DIRECTORY ${slimvaluesrc_SOURCE_DIR}/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/include/slim/SlimValue.hpp"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/slim
+)
 
 install(EXPORT SlimTargets
         FILE SlimTargets.cmake
@@ -139,9 +123,6 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
-# ------------------------------------------------------------
-# CPack
-# ------------------------------------------------------------
 set(CPACK_GENERATOR "DEB;RPM")
 
 set(CPACK_PACKAGE_NAME "slimvalue")
