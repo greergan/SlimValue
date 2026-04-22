@@ -5,5 +5,5 @@ TEST_CASE("SlimValue assingment from SlimValue in declaration") {
 	slim::SlimValue a = 42;
 	REQUIRE(a == 42);
 	slim::SlimValue b = a;
-	REQUIRE(b = a);
+	REQUIRE(b == a);
 }
