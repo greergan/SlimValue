@@ -97,8 +97,11 @@ namespace slim {
 						if constexpr (std::is_same_v<U, std::string>) {
 							return _v == _rhs;
 						}
-						else {
+						else if constexpr (std::is_constructible_v<std::string_view, U>) {
 							return _v == std::string_view(_rhs);
+						}
+						else {
+							return false;
 						}
 					}
 					else if constexpr (std::is_integral_v<_V> && std::is_integral_v<U>) {
