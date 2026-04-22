@@ -19,10 +19,6 @@ if(NOT GIT_TAG)
     set(GIT_TAG main)
 endif()
 
-project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
-
 # ------------------------------------------------------------
 # Fetch source ONLY (no upstream CMake execution)
 # ------------------------------------------------------------
@@ -32,7 +28,11 @@ FetchContent_Declare(
     GIT_TAG        ${GIT_TAG}
 )
 
-FetchContent_MakeAvailable(SlimValueSrc)
+project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+FetchContent_Populate(SlimValueSrc)
 
 # ------------------------------------------------------------
 # Library (your wrapper target)
@@ -48,7 +48,7 @@ target_include_directories(slim
 target_compile_features(slim INTERFACE cxx_std_23)
 
 # ------------------------------------------------------------
-# Tests 
+# Tests (your control, not upstream)
 # ------------------------------------------------------------
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
