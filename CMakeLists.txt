@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(SlimValue LANGUAGES CXX)
-
 include(FetchContent)
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
 
 # ------------------------------------------------------------
 # Resolve latest tag (remote)
@@ -17,11 +13,15 @@ execute_process(
 )
 
 string(REGEX MATCH "refs/tags/([^\\^\\n]+)" _ "${TAGS_RAW}")
-set(LATEST_TAG ${CMAKE_MATCH_1})
+set(GIT_TAG ${CMAKE_MATCH_1})
 
-if(NOT LATEST_TAG)
-    set(LATEST_TAG main)
+if(NOT GIT_TAG)
+    set(GIT_TAG main)
 endif()
+
+project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 # ------------------------------------------------------------
 # Fetch source ONLY (no upstream CMake execution)
@@ -29,10 +29,10 @@ endif()
 FetchContent_Declare(
     SlimValueSrc
     GIT_REPOSITORY https://github.com/greergan/SlimValue.git
-    GIT_TAG        ${LATEST_TAG}
+    GIT_TAG        ${GIT_TAG}
 )
 
-FetchContent_Populate(SlimValueSrc)
+FetchContent_MakeAvailable(SlimValueSrc)
 
 # ------------------------------------------------------------
 # Library (your wrapper target)
@@ -48,7 +48,7 @@ target_include_directories(slim
 target_compile_features(slim INTERFACE cxx_std_23)
 
 # ------------------------------------------------------------
-# Tests (your control, not upstream)
+# Tests 
 # ------------------------------------------------------------
 option(SLIM_BUILD_TESTS "Build tests" ON)
 
@@ -94,7 +94,7 @@ install(EXPORT SlimTargets
 
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfigVersion.cmake"
-    VERSION ${LATEST_TAG}
+    VERSION ${GIT_TAG}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -124,20 +124,19 @@ install(FILES
 set(CPACK_GENERATOR "DEB;RPM")
 
 set(CPACK_PACKAGE_NAME "slimvalue")
-set(CPACK_PACKAGE_VERSION ${LATEST_TAG})
-set(CPACK_PACKAGE_CONTACT "you@example.com")
-
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "you")
+set(CPACK_PACKAGE_VERSION ${GIT_TAG})
+set(CPACK_PACKAGE_CONTACT "greergan@gmail.com")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jeff Greer")
 set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
 
 set(CPACK_RPM_PACKAGE_NAME "slimvalue")
-set(CPACK_RPM_PACKAGE_VERSION ${LATEST_TAG})
+set(CPACK_RPM_PACKAGE_VERSION ${GIT_TAG})
 set(CPACK_RPM_PACKAGE_RELEASE "1")
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
 set(CPACK_RPM_PACKAGE_SUMMARY "SlimValue header-only C++ library")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "all")
 
 include(CPack)
