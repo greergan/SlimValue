@@ -8,6 +8,10 @@
 #include <unordered_map>
 #include <variant>
 
+#define SLIMVALUE_VERSION "@SLIMVALUE_VERSION@"
+#define SLIMVALUE_GIT_HASH "@SLIMVALUE_GIT_HASH@"
+#define SLIMVALUE_VERSION_FULL "@SLIMVALUE_VERSION_FULL@"
+
 namespace slim {
 	using slim_coordinates = std::pair<int, int>;
 	struct AnyValue {

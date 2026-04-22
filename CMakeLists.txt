@@ -35,13 +35,34 @@ include(CMakePackageConfigHelpers)
 FetchContent_Populate(SlimValueSrc)
 
 # ------------------------------------------------------------
-# Library (your wrapper target)
+# Version header generation (SlimValue.hpp)
+# ------------------------------------------------------------
+set(SLIMVALUE_VERSION ${GIT_TAG})
+
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
+
+configure_file(
+    "${slimvaluesrc_SOURCE_DIR}/include/SlimValue.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/SlimValue.hpp"
+    @ONLY
+)
+
+# ------------------------------------------------------------
+# Library (wrapper interface target)
 # ------------------------------------------------------------
 add_library(slim INTERFACE)
 
 target_include_directories(slim
     INTERFACE
         $<BUILD_INTERFACE:${slimvaluesrc_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -126,6 +147,7 @@ set(CPACK_GENERATOR "DEB;RPM")
 set(CPACK_PACKAGE_NAME "slimvalue")
 set(CPACK_PACKAGE_VERSION ${GIT_TAG})
 set(CPACK_PACKAGE_CONTACT "greergan@gmail.com")
+
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jeff Greer")
 set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
