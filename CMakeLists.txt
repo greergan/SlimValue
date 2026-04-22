@@ -7,21 +7,19 @@ include(FetchContent)
 # ------------------------------------------------------------
 set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local SlimValue source instead of git")
 
-# ------------------------------------------------------------
-# Existing tag resolution (unchanged)
-# ------------------------------------------------------------
-execute_process(
-    COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
-    OUTPUT_VARIABLE TAGS_RAW
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-)
+if(SLIM_USE_LOCAL_SOURCE)
+    set(GIT_TAG 0.0.0)
+    set(SLIMVALUE_GIT_HASH "non-local")
+else()
+    execute_process(
+        COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
+        OUTPUT_VARIABLE TAGS_RAW
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
 
-string(REGEX MATCH "refs/tags/([^\\^\\n]+)" _ "${TAGS_RAW}")
-set(GIT_TAG ${CMAKE_MATCH_1})
-
-if(NOT GIT_TAG)
-    set(GIT_TAG main)
+    string(REGEX MATCH "refs/tags/([^\\^\\n]+)" _ "${TAGS_RAW}")
+    set(GIT_TAG ${CMAKE_MATCH_1})
 endif()
 
 # ------------------------------------------------------------
@@ -39,21 +37,20 @@ else()
     message(STATUS "using GIT source (tag: ${GIT_TAG})")
     message(STATUS "fetched from https://github.com/greergan/SlimValue.git")
     FetchContent_Populate(SlimValueSrc)
+        execute_process(
+        COMMAND git rev-parse --short HEAD
+        OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
 endif()
 
 project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+
 set(SLIMVALUE_VERSION ${GIT_TAG})
-
-execute_process(
-    COMMAND git rev-parse --short HEAD
-    OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-)
-
 set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
 
 configure_file(
