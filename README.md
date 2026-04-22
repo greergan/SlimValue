@@ -57,21 +57,10 @@ Build packages
 docker run -it --rm -v $PWD:/dist slimvalue-package-maker bash -c "cd /workspace && make packages"
 ```
 
-
-
-RUN make packages
-```
-
 ### Build
 
 ``` bash
 make build
-```
-
-### Release build
-
-``` bash
-make release
 ```
 
 ### Install
@@ -87,61 +76,3 @@ Custom prefix:
 ``` bash
 make install INSTALL_PREFIX=/your/path
 ```
-
-------------------------------------------------------------------------
-
-### Tests
-
-``` bash
-make test
-```
-
-Runs: - CTest suite - slim_tests executable
-
-------------------------------------------------------------------------
-
-### Packaging
-
-#### Debian package
-
-Works on Debian-based Linux distributions (e.g. Debian, Ubuntu, Linux Mint).
-
-``` bash
-make deb
-```
-
-#### RPM package
-
-Works on RPM-based Linux distributions (e.g. Fedora, RHEL, CentOS, openSUSE).
-
-``` bash
-make rpm
-```
-
-#### Both (RPM and DEB packages)
-
-Builds both Debian and RPM packages.
-
-##### Container usage (recommended)
-[Container example](#example-dockerfile)
-
-When generating both package formats, it is recommended to run the build inside a container. This avoids host system contamination and ensures consistent tooling versions across environments.
-
-This is especially important when:
-- building RPM packages on Debian-based systems
-- building DEB packages on RPM-based systems
-- producing release artifacts for distribution
-
-
-``` bash
-make package
-```
-
-------------------------------------------------------------------------
-
-### Clean
-
-``` bash
-make clean
-```
-
