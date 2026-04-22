@@ -2,13 +2,14 @@ BUILD_DIR := build
 INSTALL_PREFIX ?= /usr/local
 CMAKE := cmake
 DIST_DIR ?= .
+LOCAL_SRC ?= ON;
 
 .PHONY: all configure build install test deb rpm packages clean
 
 all: build
 
 configure:
-	$(CMAKE) -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) -DCPACK_OUTPUT_FILE_PREFIX=$(DIST_DIR)
+	$(CMAKE) -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) -DCPACK_OUTPUT_FILE_PREFIX=$(DIST_DIR) -DSLIM_USE_LOCAL_SOURCE=$(LOCAL_SRC)
 
 build: configure
 	$(CMAKE) --build $(BUILD_DIR)

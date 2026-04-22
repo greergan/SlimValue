@@ -1,3 +1,4 @@
+#include <string_view>
 #include <slim/SlimValue.hpp>
 #include <catch2/catch_test_macros.hpp>
 

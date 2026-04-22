@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.20)
 
 include(FetchContent)
 
+# ------------------------------------------------------------
+# Local override controls (added only)
+# ------------------------------------------------------------
+set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local SlimValue source instead of git")
+
+# ------------------------------------------------------------
+# Existing tag resolution (unchanged)
+# ------------------------------------------------------------
 execute_process(
     COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
     OUTPUT_VARIABLE TAGS_RAW
@@ -16,17 +24,26 @@ if(NOT GIT_TAG)
     set(GIT_TAG main)
 endif()
 
-FetchContent_Declare(
-    SlimValueSrc
-    GIT_REPOSITORY https://github.com/greergan/SlimValue.git
-    GIT_TAG        ${GIT_TAG}
-)
+# ------------------------------------------------------------
+# FetchContent guarded (only change: conditional)
+# ------------------------------------------------------------
+if(SLIM_USE_LOCAL_SOURCE)
+    set(slimvaluesrc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    message(STATUS "using LOCAL source (${slimvaluesrc_SOURCE_DIR})")
+else()
+    FetchContent_Declare(
+        SlimValueSrc
+        GIT_REPOSITORY https://github.com/greergan/SlimValue.git
+        GIT_TAG        ${GIT_TAG}
+    )
+    message(STATUS "using GIT source (tag: ${GIT_TAG})")
+    message(STATUS "fetched from https://github.com/greergan/SlimValue.git")
+    FetchContent_Populate(SlimValueSrc)
+endif()
 
 project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
-
-FetchContent_Populate(SlimValueSrc)
 
 set(SLIMVALUE_VERSION ${GIT_TAG})
 
