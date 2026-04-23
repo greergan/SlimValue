@@ -37,7 +37,12 @@ endif()
 # FetchContent guarded (only change: conditional)
 # ------------------------------------------------------------
 if(SLIM_USE_LOCAL_SOURCE)
-    set(slimlibrarysrc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    FetchContent_Declare(
+        SlimLibrarySrc
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
+    FetchContent_MakeAvailable(SlimLibrarySrc)
     message(STATUS "using LOCAL source (${slimlibrarysrc_SOURCE_DIR})")
 else()
     FetchContent_Declare(
@@ -47,8 +52,10 @@ else()
     )
     message(STATUS "using GIT source (tag: ${GIT_TAG})")
     message(STATUS "fetched from https://github.com/greergan/${SLIM_LIB}.git")
-    FetchContent_Populate(SlimLibrarySrc)
-        execute_process(
+
+    FetchContent_MakeAvailable(SlimLibrarySrc)
+
+    execute_process(
         COMMAND git rev-parse --short HEAD
         OUTPUT_VARIABLE SLIM_LIB_GIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
