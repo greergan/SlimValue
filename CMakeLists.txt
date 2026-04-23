@@ -119,7 +119,7 @@ endif()
 message(STATUS "version tag: ${GIT_TAG}")
 message(STATUS "version hash: ${SLIMVALUE_GIT_HASH}")
 message(STATUS "full version: ${SLIMVALUE_VERSION_FULL}")
-message(STATUS "Package maintainer: "${GIT_USER_NAME} <${GIT_USER_EMAIL}>")
+message(STATUS "Package maintainer: ${GIT_USER_NAME} <${GIT_USER_EMAIL}>")
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
