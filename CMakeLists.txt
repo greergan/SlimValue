@@ -20,7 +20,7 @@ set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local library source instead of gi
 
 if(SLIM_USE_LOCAL_SOURCE)
     set(GIT_TAG 0.0.0)
-    set(SLIMVALUE_GIT_HASH "none")
+    set(SLIM_LIB_GIT_HASH "none")
 else()
     execute_process(
         COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/${SLIM_LIB}.git
@@ -50,7 +50,7 @@ else()
     FetchContent_Populate(SlimLibrarySrc)
         execute_process(
         COMMAND git rev-parse --short HEAD
-        OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
+        OUTPUT_VARIABLE SLIM_LIB_GIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
@@ -69,13 +69,12 @@ endif()
 if(EXISTS ${HPP_IN_FILE})
     set(HPP_HEADER_ONLY ON CACHE BOOL "Is .hpp header only library")
     set(HPP_OUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/slim/${SLIM_LIB}.hpp")
-    message(STATUS "${HPP_IN_FILE} exists")
+    set(SLIM_LIB_DESCRIPTION "${SLIM_LIB} header-only C++ library")
 else()
-
 endif()
 
-set(SLIMVALUE_VERSION ${GIT_TAG})
-set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
+set(SLIM_LIB_VERSION ${GIT_TAG})
+set(SLIM_LIB_VERSION_FULL "${SLIM_LIB_VERSION}+${SLIM_LIB_GIT_HASH}")
 
 message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -94,8 +93,8 @@ else()
 endif()
 
 message(STATUS "version tag: ${GIT_TAG}")
-message(STATUS "version hash: ${SLIMVALUE_GIT_HASH}")
-message(STATUS "full version: ${SLIMVALUE_VERSION_FULL}")
+message(STATUS "version hash: ${SLIM_LIB_GIT_HASH}")
+message(STATUS "full version: ${SLIM_LIB_VERSION_FULL}")
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -223,7 +222,7 @@ set(CPACK_RPM_PACKAGE_VERSION ${GIT_TAG})
 set(CPACK_RPM_PACKAGE_RELEASE "1")
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
-set(CPACK_RPM_PACKAGE_SUMMARY "SlimValue header-only C++ library")
+set(CPACK_RPM_PACKAGE_SUMMARY ${SLIM_LIB_DESCRIPTION})
 set(CPACK_RPM_PACKAGE_ARCHITECTURE ${ARCH_NAME})
 set(CPACK_RPM_PACKAGE_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
