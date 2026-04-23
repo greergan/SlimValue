@@ -1,7 +1,18 @@
 cmake_minimum_required(VERSION 3.20)
 
+message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "Project dir: ${CMAKE_SOURCE_DIR}")
 message(STATUS "Build dir:   ${CMAKE_BINARY_DIR}")
+
+if(DEFINED CPACK_OUTPUT_FILE_PREFIX)
+    if("${CPACK_OUTPUT_FILE_PREFIX}" STREQUAL ".")
+	    set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_SOURCE_DIR})
+    endif()
+else()
+	message(FATAL_ERROR "CPACK_OUTPUT_FILE_PREFIX is not set")
+endif()
+message(STATUS "Dist dir: ${CPACK_OUTPUT_FILE_PREFIX}")
 
 cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
 string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
