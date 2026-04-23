@@ -4,6 +4,23 @@ CMAKE := cmake
 DIST_DIR ?= .
 LOCAL_SRC ?= ON;
 
+ARCH_RAW := $(shell uname -m)
+ifeq ($(ARCH_RAW),x86_64)
+	ARCH := x86_64
+else ifeq ($(ARCH_RAW),amd64)
+	ARCH := x86_64
+else ifeq ($(ARCH_RAW),i386)
+	ARCH := x86
+else ifeq ($(ARCH_RAW),i686)
+	ARCH := x86
+else ifeq ($(ARCH_RAW),aarch64)
+	ARCH := arm64
+else ifeq ($(ARCH_RAW),armv7l)
+	ARCH := arm
+else
+	ARCH := unknown
+endif
+
 .PHONY: all configure build install test deb rpm packages clean
 
 all: build
@@ -18,8 +35,32 @@ configure:
 build: configure
 	$(CMAKE) --build $(BUILD_DIR)
 
-install: build
-	$(CMAKE) --install $(BUILD_DIR)
+install:
+	. /etc/os-release 2>/dev/null || true; \
+	if echo "$$ID_LIKE $$ID" | grep -qi debian; then \
+		$(MAKE) deb; \
+		PKG=$$(ls *.deb 2>/dev/null | head -n 1); \
+		if [ -n "$$PKG" ]; then \
+			echo "Installing $$PKG"; \
+			dpkg -i "$$PKG"; \
+		else \
+			echo "No .deb produced"; \
+			exit 1; \
+		fi; \
+	elif echo "$$ID_LIKE $$ID" | grep -qi rhel; then \
+		$(MAKE) rpm; \
+		PKG=$$(ls *.rpm 2>/dev/null | head -n 1); \
+		if [ -n "$$PKG" ]; then \
+			echo "Installing $$PKG"; \
+			rpm -i "$$PKG"; \
+		else \
+			echo "No .rpm produced"; \
+			exit 1; \
+		fi; \
+	else \
+		echo "Unsupported platform"; \
+		exit 1; \
+	fi
 
 test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure --verbose
@@ -36,3 +77,4 @@ packages: test
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -f *.deb *.rpm
