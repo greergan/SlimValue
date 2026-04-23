@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
+message(STATUS "Project dir: ${CMAKE_SOURCE_DIR}")
+message(STATUS "Build dir:   ${CMAKE_BINARY_DIR}")
+
+cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
+string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
+message(STATUS "slim library name: ${SLIM_LIB}")
+message(STATUS ".pc.in stub name: ${SLIM_LIB_LOWER}")
+
 include(FetchContent)
 
 # ------------------------------------------------------------
@@ -12,7 +20,7 @@ if(SLIM_USE_LOCAL_SOURCE)
     set(SLIMVALUE_GIT_HASH "none")
 else()
     execute_process(
-        COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/SlimValue.git
+        COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/${SLIM_LIB}.git
         OUTPUT_VARIABLE TAGS_RAW
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
