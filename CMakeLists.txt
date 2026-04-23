@@ -16,7 +16,7 @@ include(FetchContent)
 # ------------------------------------------------------------
 # Local override controls (added only)
 # ------------------------------------------------------------
-set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local SlimValue source instead of git")
+set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local library source instead of git")
 
 if(SLIM_USE_LOCAL_SOURCE)
     set(GIT_TAG 0.0.0)
@@ -164,21 +164,21 @@ endif()
 install(EXPORT SlimTargets
         FILE SlimTargets.cmake
         NAMESPACE Slim::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SlimValue)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${SLIM_LIB})
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SLIM_LIB}ConfigVersion.cmake"
     VERSION ${GIT_TAG}
     COMPATIBILITY AnyNewerVersion
 )
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfig.cmake"
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${SLIM_LIB}Config.cmake"
 "include(\"\${CMAKE_CURRENT_LIST_DIR}/SlimTargets.cmake\")\n")
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/SlimValueConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SlimValue
+    "${CMAKE_CURRENT_BINARY_DIR}/${SLIM_LIB}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SLIM_LIB}ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${SLIM_LIB}
 )
 
 configure_file(
