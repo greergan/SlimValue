@@ -5,7 +5,8 @@ CMakeFiles/
 CMakeCache.txt
 CTestTestfile.cmake
 cmake_install.cmake
-
+*.deb
+*.rpm
 
 # IDEs
 .vscode/
