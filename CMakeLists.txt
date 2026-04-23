@@ -20,7 +20,7 @@ set(SLIM_USE_LOCAL_SOURCE OFF CACHE BOOL "Use local library source instead of gi
 
 if(SLIM_USE_LOCAL_SOURCE)
     set(GIT_TAG 0.0.0)
-    set(SLIM_LIB_GIT_HASH "none")
+    set(SLIMVALUE_GIT_HASH "none")
 else()
     execute_process(
         COMMAND git ls-remote --tags --sort=-v:refname https://github.com/greergan/${SLIM_LIB}.git
@@ -37,12 +37,7 @@ endif()
 # FetchContent guarded (only change: conditional)
 # ------------------------------------------------------------
 if(SLIM_USE_LOCAL_SOURCE)
-    FetchContent_Declare(
-        SlimLibrarySrc
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
-    FetchContent_MakeAvailable(SlimLibrarySrc)
+    set(slimlibrarysrc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     message(STATUS "using LOCAL source (${slimlibrarysrc_SOURCE_DIR})")
 else()
     FetchContent_Declare(
@@ -52,12 +47,10 @@ else()
     )
     message(STATUS "using GIT source (tag: ${GIT_TAG})")
     message(STATUS "fetched from https://github.com/greergan/${SLIM_LIB}.git")
-
-    FetchContent_MakeAvailable(SlimLibrarySrc)
-
-    execute_process(
+    FetchContent_Populate(SlimLibrarySrc)
+        execute_process(
         COMMAND git rev-parse --short HEAD
-        OUTPUT_VARIABLE SLIM_LIB_GIT_HASH
+        OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
@@ -69,6 +62,7 @@ set(LIB_PC_IN_FILE ${SLIM_LIB_LOWER}.pc.in)
 set(LIB_PC_FILE ${SLIM_LIB_LOWER}.pc)
 set(HPP_IN_FILE "${slimlibrarysrc_SOURCE_DIR}/include/slim/${SLIM_LIB}.hpp.in")
 
+
 if(NOT EXISTS ${LIB_PC_IN_FILE})
     message(FATAL_ERROR "${LIB_PC_IN_FILE} File not found")
 endif()
@@ -76,12 +70,14 @@ endif()
 if(EXISTS ${HPP_IN_FILE})
     set(HPP_HEADER_ONLY ON CACHE BOOL "Is .hpp header only library")
     set(HPP_OUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/slim/${SLIM_LIB}.hpp")
+    message(STATUS "${HPP_IN_FILE} exists")
     set(SLIM_LIB_DESCRIPTION "${SLIM_LIB} header-only C++ library")
 else()
+
 endif()
 
-set(SLIM_LIB_VERSION ${GIT_TAG})
-set(SLIM_LIB_VERSION_FULL "${SLIM_LIB_VERSION}+${SLIM_LIB_GIT_HASH}")
+set(SLIMVALUE_VERSION ${GIT_TAG})
+set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
 
 message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -100,8 +96,8 @@ else()
 endif()
 
 message(STATUS "version tag: ${GIT_TAG}")
-message(STATUS "version hash: ${SLIM_LIB_GIT_HASH}")
-message(STATUS "full version: ${SLIM_LIB_VERSION_FULL}")
+message(STATUS "version hash: ${SLIMVALUE_GIT_HASH}")
+message(STATUS "full version: ${SLIMVALUE_VERSION_FULL}")
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
