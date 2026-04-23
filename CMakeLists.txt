@@ -129,7 +129,7 @@ install(FILES
 )
 
 configure_file(
-    "${slimvaluesrc_SOURCE_DIR}/cmake/slimvalue.pc.in"
+    "${slimvaluesrc_SOURCE_DIR}/slimvalue.pc.in"
     "${CMAKE_CURRENT_BINARY_DIR}/slimvalue.pc"
     @ONLY
 )
