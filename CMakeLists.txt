@@ -37,17 +37,17 @@ endif()
 # FetchContent guarded (only change: conditional)
 # ------------------------------------------------------------
 if(SLIM_USE_LOCAL_SOURCE)
-    set(slim_library_src_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-    message(STATUS "using LOCAL source (${slim_library_src_SOURCE_DIR})")
+    set(slimlibrarysrc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    message(STATUS "using LOCAL source (${slimlibrarysrc_SOURCE_DIR})")
 else()
     FetchContent_Declare(
-        SlimValueSrc
-        GIT_REPOSITORY https://github.com/greergan/SlimValue.git
+        SlimLibrarySrc
+        GIT_REPOSITORY https://github.com/greergan/${SLIM_LIB}.git
         GIT_TAG        ${GIT_TAG}
     )
     message(STATUS "using GIT source (tag: ${GIT_TAG})")
-    message(STATUS "fetched from https://github.com/greergan/SlimValue.git")
-    FetchContent_Populate(SlimValueSrc)
+    message(STATUS "fetched from https://github.com/greergan/${SLIM_LIB}.git")
+    FetchContent_Populate(SlimLibrarySrc)
         execute_process(
         COMMAND git rev-parse --short HEAD
         OUTPUT_VARIABLE SLIMVALUE_GIT_HASH
@@ -56,11 +56,11 @@ else()
     )
 endif()
 
-project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
+project(${SLIM_LIB} VERSION ${GIT_TAG} LANGUAGES CXX)
 
 set(LIB_PC_IN_FILE ${SLIM_LIB_LOWER}.pc.in)
 set(LIB_PC_FILE ${SLIM_LIB_LOWER}.pc)
-set(HPP_IN_FILE "${slim_library_src_SOURCE_DIR}/include/slim/${SLIM_LIB}.hpp.in")
+set(HPP_IN_FILE "${slimlibrarysrc_SOURCE_DIR}/include/slim/${SLIM_LIB}.hpp.in")
 
 if(NOT EXISTS ${LIB_PC_IN_FILE})
     message(FATAL_ERROR "${LIB_PC_IN_FILE} File not found")
@@ -113,7 +113,7 @@ add_library(slim INTERFACE)
 
 target_include_directories(slim
     INTERFACE
-        $<BUILD_INTERFACE:${slim_library_src_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${slimlibrarysrc_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
@@ -135,11 +135,11 @@ if(SLIM_BUILD_TESTS)
     enable_testing()
 
     add_executable(slim_tests
-        ${slim_library_src_SOURCE_DIR}/tests/slim_tests.cpp
-        ${slim_library_src_SOURCE_DIR}/tests/anyvalue_tests.cpp
-        ${slim_library_src_SOURCE_DIR}/tests/errorinfo_tests.cpp
-        ${slim_library_src_SOURCE_DIR}/tests/slimmap_tests.cpp
-        ${slim_library_src_SOURCE_DIR}/tests/slimvalue_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/slim_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/anyvalue_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/errorinfo_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/slimmap_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/slimvalue_tests.cpp
     )
 
     target_link_libraries(slim_tests
@@ -182,7 +182,7 @@ install(FILES
 )
 
 configure_file(
-    "${slim_library_src_SOURCE_DIR}/${LIB_PC_IN_FILE}"
+    "${slimlibrarysrc_SOURCE_DIR}/${LIB_PC_IN_FILE}"
     "${CMAKE_CURRENT_BINARY_DIR}/${LIB_PC_FILE}"
     @ONLY
 )
