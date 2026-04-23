@@ -100,8 +100,6 @@ message(STATUS "full version: ${SLIMVALUE_VERSION_FULL}")
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-
-
 if(HPP_HEADER_ONLY)
     configure_file(
         "${HPP_IN_FILE}"
@@ -155,10 +153,13 @@ endif()
 
 install(TARGETS slim EXPORT SlimTargets)
 
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/include/slim/SlimValue.hpp"
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/slim
-)
+if(HPP_HEADER_ONLY)
+    install(FILES
+        "${HPP_OUT_FILE}"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/slim
+    )
+else()
+endif()
 
 install(EXPORT SlimTargets
         FILE SlimTargets.cmake
