@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
-message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
-message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
-message(STATUS "Project dir: ${CMAKE_SOURCE_DIR}")
-message(STATUS "Build dir:   ${CMAKE_BINARY_DIR}")
+cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
+string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
 
 if(DEFINED CPACK_OUTPUT_FILE_PREFIX)
     if("${CPACK_OUTPUT_FILE_PREFIX}" STREQUAL ".")
@@ -12,12 +10,6 @@ if(DEFINED CPACK_OUTPUT_FILE_PREFIX)
 else()
 	message(FATAL_ERROR "CPACK_OUTPUT_FILE_PREFIX is not set")
 endif()
-message(STATUS "Dist dir: ${CPACK_OUTPUT_FILE_PREFIX}")
-
-cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
-string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
-message(STATUS "slim library name: ${SLIM_LIB}")
-message(STATUS ".pc.in stub name: ${SLIM_LIB_LOWER}")
 
 include(FetchContent)
 
@@ -65,6 +57,15 @@ else()
 endif()
 
 project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
+
+message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "Project dir: ${CMAKE_SOURCE_DIR}")
+message(STATUS "Build dir:   ${CMAKE_BINARY_DIR}")
+message(STATUS "Dist dir: ${CPACK_OUTPUT_FILE_PREFIX}")
+message(STATUS "slim library name: ${SLIM_LIB}")
+message(STATUS ".pc.in stub name: ${SLIM_LIB_LOWER}")
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
@@ -158,7 +159,22 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" ARCH)
+if(ARCH MATCHES "x86_64|amd64")
+    set(ARCH_NAME "x86_64")
+elseif(ARCH MATCHES "i386|i686")
+    set(ARCH_NAME "x86")
+elseif(ARCH MATCHES "aarch64|arm64")
+    set(ARCH_NAME "arm64")
+elseif(ARCH MATCHES "armv7|arm")
+    set(ARCH_NAME "arm")
+else()
+    set(ARCH_NAME "unknown")
+endif()
+
 set(CPACK_GENERATOR "DEB;RPM")
+
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-${ARCH_NAME}")
 
 set(CPACK_PACKAGE_NAME "slimvalue")
 set(CPACK_PACKAGE_VERSION ${GIT_TAG})
@@ -167,7 +183,7 @@ set(CPACK_PACKAGE_CONTACT "greergan@gmail.com")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jeff Greer")
 set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${ARCH_NAME})
 
 set(CPACK_RPM_PACKAGE_NAME "slimvalue")
 set(CPACK_RPM_PACKAGE_VERSION ${GIT_TAG})
@@ -175,6 +191,6 @@ set(CPACK_RPM_PACKAGE_RELEASE "1")
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
 set(CPACK_RPM_PACKAGE_SUMMARY "SlimValue header-only C++ library")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE "noarch")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE ${ARCH_NAME})
 
 include(CPack)
