@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.20)
 
 cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
 string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
+set(LIB_PC_IN_FILE ${SLIM_LIB_LOWER}.pc.in)
+set(LIB_PC_FILE ${SLIM_LIB_LOWER}.pc)
+
+if(NOT EXISTS ${LIB_PC_IN_FILE})
+    message(FATAL_ERROR "${LIB_PC_IN_FILE} File not found")
+endif()
 
 if(DEFINED CPACK_OUTPUT_FILE_PREFIX)
     if("${CPACK_OUTPUT_FILE_PREFIX}" STREQUAL ".")
@@ -65,11 +71,10 @@ message(STATUS "Build dir:   ${CMAKE_BINARY_DIR}")
 message(STATUS "Dist dir: ${CPACK_OUTPUT_FILE_PREFIX}")
 message(STATUS "Local INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "slim library name: ${SLIM_LIB}")
-message(STATUS ".pc.in stub name: ${SLIM_LIB_LOWER}")
+message(STATUS  "Library .pc.in name: ${LIB_PC_IN_FILE}")
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
-
 
 set(SLIMVALUE_VERSION ${GIT_TAG})
 set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
@@ -150,13 +155,13 @@ install(FILES
 )
 
 configure_file(
-    "${slimvaluesrc_SOURCE_DIR}/slimvalue.pc.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/slimvalue.pc"
+    "${slimvaluesrc_SOURCE_DIR}/${LIB_PC_IN_FILE}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_PC_FILE}"
     @ONLY
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/slimvalue.pc"
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_PC_FILE}"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
