@@ -1,5 +1,5 @@
 BUILD_DIR := build
-INSTALL_PREFIX ?= /usr/local
+INSTALL_PREFIX ?= /usr
 CMAKE := cmake
 DIST_DIR ?= .
 LOCAL_SRC ?= ON;
