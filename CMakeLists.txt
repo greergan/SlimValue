@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 
 cmake_path(GET CMAKE_SOURCE_DIR FILENAME SLIM_LIB)
 string(TOLOWER "${SLIM_LIB}" SLIM_LIB_LOWER)
-set(LIB_PC_IN_FILE ${SLIM_LIB_LOWER}.pc.in)
-set(LIB_PC_FILE ${SLIM_LIB_LOWER}.pc)
-
-if(NOT EXISTS ${LIB_PC_IN_FILE})
-    message(FATAL_ERROR "${LIB_PC_IN_FILE} File not found")
-endif()
 
 if(DEFINED CPACK_OUTPUT_FILE_PREFIX)
     if("${CPACK_OUTPUT_FILE_PREFIX}" STREQUAL ".")
@@ -64,6 +58,25 @@ endif()
 
 project(SlimValue VERSION ${GIT_TAG} LANGUAGES CXX)
 
+set(LIB_PC_IN_FILE ${SLIM_LIB_LOWER}.pc.in)
+set(LIB_PC_FILE ${SLIM_LIB_LOWER}.pc)
+set(HPP_IN_FILE "${slimvaluesrc_SOURCE_DIR}/include/slim/${SLIM_LIB}.hpp.in")
+
+if(NOT EXISTS ${LIB_PC_IN_FILE})
+    message(FATAL_ERROR "${LIB_PC_IN_FILE} File not found")
+endif()
+
+if(EXISTS ${HPP_IN_FILE})
+    set(HPP_HEADER_ONLY ON CACHE BOOL "Is .hpp header only library")
+    set(HPP_OUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/slim/${SLIM_LIB}.hpp")
+    message(STATUS "${HPP_IN_FILE} exists")
+else()
+
+endif()
+
+set(SLIMVALUE_VERSION ${GIT_TAG})
+set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
+
 message(STATUS "OS: ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "Project dir: ${CMAKE_SOURCE_DIR}")
@@ -73,17 +86,30 @@ message(STATUS "Local INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "slim library name: ${SLIM_LIB}")
 message(STATUS  "Library .pc.in name: ${LIB_PC_IN_FILE}")
 
+if(HPP_HEADER_ONLY)
+    message(STATUS "install .hpp only: ${HPP_HEADER_ONLY}")
+    message(STATUS ".hpp.in file: ${HPP_IN_FILE}")
+    message(STATUS ".hpp file: ${HPP_OUT_FILE}")
+else()
+endif()
+
+message(STATUS "version tag: ${GIT_TAG}")
+message(STATUS "version hash: ${SLIMVALUE_GIT_HASH}")
+message(STATUS "full version: ${SLIMVALUE_VERSION_FULL}")
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(SLIMVALUE_VERSION ${GIT_TAG})
-set(SLIMVALUE_VERSION_FULL "${SLIMVALUE_VERSION}+${SLIMVALUE_GIT_HASH}")
 
-configure_file(
-    "${slimvaluesrc_SOURCE_DIR}/include/slim/SlimValue.hpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/include/slim/SlimValue.hpp"
-    @ONLY
-)
+
+if(HPP_HEADER_ONLY)
+    configure_file(
+        "${HPP_IN_FILE}"
+        "${HPP_OUT_FILE}"
+        @ONLY
+    )
+else()
+endif()
 
 add_library(slim INTERFACE)
 
