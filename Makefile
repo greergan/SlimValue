@@ -4,6 +4,9 @@ CMAKE := cmake
 DIST_DIR ?= .
 LOCAL_SRC ?= ON;
 
+IS_DEBIAN := $(shell test -f /etc/debian_version && echo "yes")
+IS_REDHAT := $(shell test -f /etc/redhat-release && echo "yes")
+
 ARCH_RAW := $(shell uname -m)
 ifeq ($(ARCH_RAW),x86_64)
 	ARCH := x86_64
@@ -36,10 +39,10 @@ build: configure
 	$(CMAKE) --build $(BUILD_DIR)
 
 install:
-	. /etc/os-release 2>/dev/null || true; \
-	if echo "$$ID_LIKE $$ID" | grep -qi debian; then \
+install:
+	@if [ "$(IS_DEBIAN)" = "yes" ]; then \
 		$(MAKE) deb; \
-		PKG=$$(ls *.deb 2>/dev/null | head -n 1); \
+		PKG=$$(ls -1t *.deb 2>/dev/null | sort --reverse | head -n 1); \
 		if [ -n "$$PKG" ]; then \
 			echo "Installing $$PKG"; \
 			dpkg -i "$$PKG"; \
@@ -47,9 +50,9 @@ install:
 			echo "No .deb produced"; \
 			exit 1; \
 		fi; \
-	elif echo "$$ID_LIKE $$ID" | grep -qi rhel; then \
+	elif [ "$(IS_REDHAT)" = "yes" ]; then \
 		$(MAKE) rpm; \
-		PKG=$$(ls *.rpm 2>/dev/null | head -n 1); \
+		PKG=$$(ls *.rpm 2>/dev/null | sort --reverse | head -n 1); \
 		if [ -n "$$PKG" ]; then \
 			echo "Installing $$PKG"; \
 			rpm -i "$$PKG"; \
@@ -60,7 +63,7 @@ install:
 	else \
 		echo "Unsupported platform"; \
 		exit 1; \
-	fi
+	fi;
 
 test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure --verbose
