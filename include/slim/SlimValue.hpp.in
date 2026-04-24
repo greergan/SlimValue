@@ -1,5 +1,9 @@
 #pragma once
+#ifndef SLIM__VALUE__HPP__ONLY
+#define SLIM__VALUE__HPP__ONLY
 #include <any>
+#include <concepts>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -133,8 +137,11 @@ namespace slim {
 						if constexpr (std::is_same_v<U, std::string>) {
 							return _v != _rhs;
 						}
-						else {
+						else if constexpr (std::is_constructible_v<std::string_view, U>) {
 							return _v != std::string_view(_rhs);
+						}
+						else {
+							return false;
 						}
 					}
 					else if constexpr (std::is_integral_v<_V> && std::is_integral_v<U>) {
@@ -174,8 +181,162 @@ namespace slim {
 				return std::get<_T>(__value);
 			}
 
+			// --- exact-type named getters ---
+
 			bool get_bool() const {
 				return get<bool>();
+			}
+
+			int get_int() const {
+				return get<int>();
+			}
+
+			long get_long() const {
+				return get<long>();
+			}
+
+			long long get_long_long() const {
+				return get<long long>();
+			}
+
+			unsigned get_unsigned() const {
+				return get<unsigned>();
+			}
+
+			unsigned long get_unsigned_long() const {
+				return get<unsigned long>();
+			}
+
+			unsigned long long get_unsigned_long_long() const {
+				return get<unsigned long long>();
+			}
+
+			float get_float() const {
+				return get<float>();
+			}
+
+			double get_double() const {
+				return get<double>();
+			}
+
+			long double get_long_double() const {
+				return get<long double>();
+			}
+
+			char get_char() const {
+				return get<char>();
+			}
+
+			const std::string& get_string() const {
+				return get<std::string>();
+			}
+
+			slim_coordinates get_coordinates() const {
+				return get<slim_coordinates>();
+			}
+
+			// --- safe cross-type numeric getters ---
+			// Cast across integral/float families without caring about exact stored type.
+			// Throw std::bad_variant_access if the stored type is incompatible.
+
+			int64_t get_as_int64() const {
+				return std::visit([](auto&& _v) -> int64_t {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+						return static_cast<int64_t>(_v);
+					else
+						throw std::bad_variant_access{};
+				}, __value);
+			}
+
+			uint64_t get_as_uint64() const {
+				return std::visit([](auto&& _v) -> uint64_t {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+						return static_cast<uint64_t>(_v);
+					else
+						throw std::bad_variant_access{};
+				}, __value);
+			}
+
+			long double get_as_float() const {
+				return std::visit([](auto&& _v) -> long double {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_floating_point_v<_T>)
+						return static_cast<long double>(_v);
+					else
+						throw std::bad_variant_access{};
+				}, __value);
+			}
+
+			double get_as_double() const {
+				return std::visit([](auto&& _v) -> double {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>)
+						return static_cast<double>(_v);
+					else
+						throw std::bad_variant_access{};
+				}, __value);
+			}
+
+			// --- optional / non-throwing getters ---
+			// Return std::nullopt if the stored type doesn't match.
+
+			std::optional<bool> try_bool() const {
+				if (is<bool>()) return get<bool>();
+				return std::nullopt;
+			}
+
+			std::optional<int64_t> try_int64() const {
+				return std::visit([](auto&& _v) -> std::optional<int64_t> {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+						return static_cast<int64_t>(_v);
+					return std::nullopt;
+				}, __value);
+			}
+
+			std::optional<double> try_double() const {
+				return std::visit([](auto&& _v) -> std::optional<double> {
+					using _T = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>)
+						return static_cast<double>(_v);
+					return std::nullopt;
+				}, __value);
+			}
+
+			std::optional<std::string> try_string() const {
+				if (is<std::string>()) return get<std::string>();
+				return std::nullopt;
+			}
+
+			std::optional<slim_coordinates> try_coordinates() const {
+				if (is<slim_coordinates>()) return get<slim_coordinates>();
+				return std::nullopt;
+			}
+
+			// --- value_or helpers ---
+			// Return the stored value cast to _T, or a fallback if types are incompatible.
+
+			template <typename _T>
+			_T value_or(_T _fallback) const {
+				return std::visit([&](auto&& _v) -> _T {
+					using _V = std::decay_t<decltype(_v)>;
+					if constexpr (std::is_convertible_v<_V, _T>)
+						return static_cast<_T>(_v);
+					else
+						return _fallback;
+				}, __value);
+			}
+
+			std::string value_or(std::string _fallback) const {
+				if (is<std::string>()) return get<std::string>();
+				return _fallback;
+			}
+
+			std::string value_or(const char* _fallback) const {
+				if (is<std::string>()) return get<std::string>();
+				return std::string(_fallback);
 			}
 
 			std::string to_string() const {
@@ -499,13 +660,54 @@ struct SlimMultiMap {
 				return __value.get<_T>();
 			}
 
+			// BUG FIX: was calling std::any_cast on an AnyValue — now correctly delegates
 			template <typename _T>
 			const _T& get() const {
-				return std::any_cast<const _T&>(__value);
+				return __value.get<_T>();
 			}
+
+			// --- exact-type named getters ---
+
+			bool get_bool() const                             { return __value.get_bool(); }
+			int get_int() const                               { return __value.get_int(); }
+			long get_long() const                             { return __value.get_long(); }
+			long long get_long_long() const                   { return __value.get_long_long(); }
+			unsigned get_unsigned() const                     { return __value.get_unsigned(); }
+			unsigned long get_unsigned_long() const           { return __value.get_unsigned_long(); }
+			unsigned long long get_unsigned_long_long() const { return __value.get_unsigned_long_long(); }
+			float get_float() const                           { return __value.get_float(); }
+			double get_double() const                         { return __value.get_double(); }
+			long double get_long_double() const               { return __value.get_long_double(); }
+			char get_char() const                             { return __value.get_char(); }
+			const std::string& get_string() const             { return __value.get_string(); }
+			slim_coordinates get_coordinates() const          { return __value.get_coordinates(); }
+
+			// --- safe cross-type numeric getters ---
+
+			int64_t     get_as_int64()  const { return __value.get_as_int64(); }
+			uint64_t    get_as_uint64() const { return __value.get_as_uint64(); }
+			double      get_as_double() const { return __value.get_as_double(); }
+			long double get_as_float()  const { return __value.get_as_float(); }
+
+			// --- optional / non-throwing getters ---
+
+			std::optional<bool>             try_bool()        const { return __value.try_bool(); }
+			std::optional<int64_t>          try_int64()       const { return __value.try_int64(); }
+			std::optional<double>           try_double()      const { return __value.try_double(); }
+			std::optional<std::string>      try_string()      const { return __value.try_string(); }
+			std::optional<slim_coordinates> try_coordinates() const { return __value.try_coordinates(); }
+
+			// --- value_or helpers ---
+
+			template <typename _T>
+			_T value_or(_T _fallback) const { return __value.value_or(std::move(_fallback)); }
+
+			std::string value_or(std::string _fallback) const { return __value.value_or(std::move(_fallback)); }
+			std::string value_or(const char* _fallback) const { return __value.value_or(_fallback); }
 
 			std::string to_string() const {
 				return __value.to_string();
 			}
 	};
 }
+#endif
