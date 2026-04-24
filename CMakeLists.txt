@@ -164,6 +164,7 @@ if(SLIM_BUILD_TESTS)
         ${slimlibrarysrc_SOURCE_DIR}/tests/errorinfo_tests.cpp
         ${slimlibrarysrc_SOURCE_DIR}/tests/slimmap_tests.cpp
         ${slimlibrarysrc_SOURCE_DIR}/tests/slimvalue_tests.cpp
+        ${slimlibrarysrc_SOURCE_DIR}/tests/test_slimvalue.cpp
     )
 
     target_link_libraries(slim_tests
