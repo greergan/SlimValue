@@ -2,14 +2,6 @@
 
 A single-header C++20 value container library providing type-safe storage, error propagation, and named map collections — with no external dependencies.
 
-Version macros are stamped at configure time via CMake:
-
-```cpp
-SLIMVALUE_VERSION       // e.g. "1.0.0"
-SLIMVALUE_GIT_HASH      // e.g. "a1b2c3d"
-SLIMVALUE_VERSION_FULL  // e.g. "1.0.0-a1b2c3d"
-```
-
 ## Types
 
 | Type | Purpose |
