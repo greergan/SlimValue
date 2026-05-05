@@ -298,18 +298,3 @@ target_include_directories(your_target PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/inclu
 ```
 
 Requires a C++20-capable compiler (`std::constructible_from`, `std::same_as` concepts).
-
-## Releases
-
-See the [GitHub Releases](https://github.com/your-org/slim/releases) page for downloads and full release notes.
-
-### Changelog
-
-#### v0.1.0
-- Initial release
-- `AnyValue` type-safe variant container
-- `ErrorInfo` optional error code and message
-- `SlimMap` and `SlimMultiMap` named collections
-- `SlimValue` unified container combining all of the above
-- Cross-type numeric getters and non-throwing `try_*` accessors
-- `value_or` helpers and `to_string` conversion
