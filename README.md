@@ -2,14 +2,6 @@
 
 A single-header C++20 value container library providing type-safe storage, error propagation, and named map collections — with no external dependencies.
 
-Version macros are stamped at configure time via CMake:
-
-```cpp
-SLIMVALUE_VERSION       // e.g. "1.0.0"
-SLIMVALUE_GIT_HASH      // e.g. "a1b2c3d"
-SLIMVALUE_VERSION_FULL  // e.g. "1.0.0-a1b2c3d"
-```
-
 ## Types
 
 | Type | Purpose |
@@ -298,18 +290,3 @@ target_include_directories(your_target PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/inclu
 ```
 
 Requires a C++20-capable compiler (`std::constructible_from`, `std::same_as` concepts).
-
-## Releases
-
-See the [GitHub Releases](https://github.com/your-org/slim/releases) page for downloads and full release notes.
-
-### Changelog
-
-#### v0.1.0
-- Initial release
-- `AnyValue` type-safe variant container
-- `ErrorInfo` optional error code and message
-- `SlimMap` and `SlimMultiMap` named collections
-- `SlimValue` unified container combining all of the above
-- Cross-type numeric getters and non-throwing `try_*` accessors
-- `value_or` helpers and `to_string` conversion
