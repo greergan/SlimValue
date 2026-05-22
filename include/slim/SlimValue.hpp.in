@@ -13,9 +13,6 @@
 
 #define SLIMVALUE_VERSION "@SLIMVALUE_VERSION@"
 #define SLIMVALUE_GIT_HASH "@SLIMVALUE_GIT_HASH@"
-#define SLIMVALUE_VERSION_FULL "@SLIMVALUE_VERSION_FULL@"
-
-#include <iostream>
 
 namespace slim {
 	using slim_coordinates = std::pair<int, int>;
@@ -545,7 +542,7 @@ struct SlimMultiMap {
 			SlimValue(_T&& _error) : __value(), __error(std::forward<_T>(_error)) {}
 
 			SlimValue(AnyValue _value, ErrorInfo _error) : __value(std::move(_value)), __error(std::move(_error)) {}
-
+			
 			SlimValue& operator=(const SlimValue& _other) {
 				if(this != &_other) {
 					__value = _other.__value;
@@ -563,6 +560,18 @@ struct SlimMultiMap {
 					__maps = std::move(_other.__maps);
 					__multi_maps = std::move(_other.__multi_maps);
 				}
+				return *this;
+			}
+
+			template <typename _T>
+			requires(
+				!std::same_as<std::decay_t<_T>, SlimValue> &&
+				!std::same_as<std::decay_t<_T>, AnyValue> &&
+				!std::same_as<std::decay_t<_T>, ErrorInfo> &&
+				std::constructible_from<AnyValue, _T>
+			)
+			SlimValue& operator=(_T&& _value) {
+				__value = AnyValue(std::forward<_T>(_value));
 				return *this;
 			}
 
