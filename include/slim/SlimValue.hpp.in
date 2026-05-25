@@ -608,6 +608,10 @@ struct SlimMultiMap {
 				return (*__maps)[std::string(_key)];
 			}
 
+			const SlimMap& as_map(std::string_view _key) const {
+				return __maps.value().at(std::string(_key));
+			}
+
 			SlimMultiMap& get_multi_map(std::string_view _key) {
 				if(!__multi_maps) {
 					__multi_maps.emplace();
