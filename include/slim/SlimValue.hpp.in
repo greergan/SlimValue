@@ -419,6 +419,10 @@ namespace slim {
 				return __map;
 			}
 
+			const std::unordered_map<std::string, AnyValue>& get() const {
+				return __map;
+			}
+
 			AnyValue& get(std::string_view _key) {
 				return __map.at(std::string(_key));
 			}
@@ -465,6 +469,10 @@ struct SlimMultiMap {
 
 		std::unordered_multimap<std::string, AnyValue>& get() {
 			return __map;
+		}
+
+		const std::unordered_multimap<std::string, AnyValue>& get() const {
+		return __map;
 		}
 
 		std::pair<
@@ -608,7 +616,7 @@ struct SlimMultiMap {
 				return (*__maps)[std::string(_key)];
 			}
 
-			const SlimMap& as_map(std::string_view _key) const {
+			const SlimMap& get_map(std::string_view _key) const {
 				return __maps.value().at(std::string(_key));
 			}
 
