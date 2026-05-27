@@ -114,10 +114,6 @@ TEST_CASE("AnyValue get_long_double", "[AnyValue][getters][exact]") {
     REQUIRE(AnyValue(2.71L).get_long_double() == Catch::Approx(2.71L));
 }
 
-TEST_CASE("AnyValue get_char", "[AnyValue][getters][exact]") {
-    REQUIRE(AnyValue('z').get_char() == 'z');
-}
-
 TEST_CASE("AnyValue get_string", "[AnyValue][getters][exact]") {
     REQUIRE(AnyValue(std::string("hello")).get_string() == "hello");
     REQUIRE(AnyValue("world").get_string() == "world");
@@ -150,13 +146,13 @@ TEST_CASE("AnyValue get_as_int64 from various integral types", "[AnyValue][gette
     REQUIRE(AnyValue(42ULL).get_as_int64() == 42);
     REQUIRE(AnyValue(true).get_as_int64()  == 1);
     REQUIRE(AnyValue(false).get_as_int64() == 0);
-    REQUIRE(AnyValue('A').get_as_int64()   == 65);
 }
 
 TEST_CASE("AnyValue get_as_int64 throws on non-integral", "[AnyValue][getters][cross][throws]") {
     REQUIRE_THROWS_AS(AnyValue(3.14).get_as_int64(),             std::bad_variant_access);
     REQUIRE_THROWS_AS(AnyValue(std::string("x")).get_as_int64(), std::bad_variant_access);
     REQUIRE_THROWS_AS(AnyValue().get_as_int64(),                 std::bad_variant_access);
+    REQUIRE_THROWS_AS(AnyValue('A').get_as_int64(),              std::bad_variant_access);
 }
 
 TEST_CASE("AnyValue get_as_uint64 from various integral types", "[AnyValue][getters][cross]") {
@@ -205,7 +201,6 @@ TEST_CASE("AnyValue try_int64 returns value for all integral types", "[AnyValue]
     REQUIRE(AnyValue(42LL).try_int64().value() == 42);
     REQUIRE(AnyValue(42U).try_int64().value()  == 42);
     REQUIRE(AnyValue(true).try_int64().value() == 1);
-    REQUIRE(AnyValue('A').try_int64().value()  == 65);
 }
 
 TEST_CASE("AnyValue try_int64 returns nullopt for non-integral", "[AnyValue][getters][optional]") {
@@ -502,10 +497,6 @@ TEST_CASE("SlimValue get_double", "[SlimValue][getters][exact]") {
 
 TEST_CASE("SlimValue get_long_double", "[SlimValue][getters][exact]") {
     REQUIRE(SlimValue(2.5L).get_long_double() == Catch::Approx(2.5L));
-}
-
-TEST_CASE("SlimValue get_char", "[SlimValue][getters][exact]") {
-    REQUIRE(SlimValue('q').get_char() == 'q');
 }
 
 TEST_CASE("SlimValue get_string", "[SlimValue][getters][exact]") {

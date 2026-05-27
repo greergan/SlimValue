@@ -30,7 +30,6 @@ namespace slim {
 				float,
 				double,
 				long double,
-				char,
 				std::string,
 				slim_coordinates
 			>;
@@ -43,8 +42,8 @@ namespace slim {
 			AnyValue(_T&& _v) {
 				using U = std::decay_t<_T>;
 
-				if constexpr (std::is_same_v<U, std::string_view>) {
-					__value = std::string(_v);
+				if constexpr (std::is_same_v<U, char>) {
+					__value = std::string(1, _v);
 				}
 				else if constexpr (std::is_constructible_v<std::string, U>) {
 					__value = std::string(_v);
@@ -52,9 +51,6 @@ namespace slim {
 				else if constexpr (std::constructible_from<Variant, U>) {
 					__value = std::forward<_T>(_v);
 				}
-/* 				else {
-					static_assert(sizeof(U) == 0, "Unsupported AnyValue type");
-				} */
 			}
 
 			explicit operator bool() const {
@@ -218,10 +214,6 @@ namespace slim {
 
 			long double get_long_double() const {
 				return get<long double>();
-			}
-
-			char get_char() const {
-				return get<char>();
 			}
 
 			const std::string& get_string() const {
@@ -681,7 +673,6 @@ struct SlimMultiMap {
 				return __value.get<_T>();
 			}
 
-			// BUG FIX: was calling std::any_cast on an AnyValue — now correctly delegates
 			template <typename _T>
 			const _T& get() const {
 				return __value.get<_T>();
@@ -699,7 +690,6 @@ struct SlimMultiMap {
 			float get_float() const                           { return __value.get_float(); }
 			double get_double() const                         { return __value.get_double(); }
 			long double get_long_double() const               { return __value.get_long_double(); }
-			char get_char() const                             { return __value.get_char(); }
 			const std::string& get_string() const             { return __value.get_string(); }
 			slim_coordinates get_coordinates() const          { return __value.get_coordinates(); }
 
@@ -718,16 +708,13 @@ struct SlimMultiMap {
 			std::optional<std::string>      try_string()      const { return __value.try_string(); }
 			std::optional<slim_coordinates> try_coordinates() const { return __value.try_coordinates(); }
 
-			// --- value_or helpers ---
-
-			template <typename _T>
-			_T value_or(_T _fallback) const { return __value.value_or(std::move(_fallback)); }
-
-			std::string value_or(std::string _fallback) const { return __value.value_or(std::move(_fallback)); }
-			std::string value_or(const char* _fallback) const { return __value.value_or(_fallback); }
-
 			std::string to_string() const {
 				return __value.to_string();
+			}
+
+			template <typename _T>
+			auto value_or(_T&& _fallback) const {
+				return __value.value_or(std::forward<_T>(_fallback));
 			}
 	};
 }

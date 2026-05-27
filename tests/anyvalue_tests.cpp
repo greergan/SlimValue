@@ -90,14 +90,6 @@ TEST_CASE("AnyValue long double") {
 	REQUIRE(v.get<long double>() == x);
 }
 
-TEST_CASE("AnyValue char") {
-	char x = 'a';
-	slim::AnyValue v(x);
-
-	REQUIRE(v.is<char>());
-	REQUIRE(v.get<char>() == x);
-}
-
 TEST_CASE("AnyValue string") {
 	std::string s = "hello";
 	slim::AnyValue v(s);

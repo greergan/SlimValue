@@ -92,7 +92,7 @@ TEST_CASE("SlimMultiMap all inserted values are retrievable", "[SlimMultiMap][mu
 	auto [begin, end] = mm.get(std::string_view("n"));
 	std::unordered_set<int> values;
 	for (auto it = begin; it != end; ++it)
-		values.insert(it->second.get_as_int64());
+		values.insert(it->second.get_int());
 
 	REQUIRE(values.count(10) == 1);
 	REQUIRE(values.count(20) == 1);
