@@ -25,13 +25,13 @@ namespace slim {
 		AnyValue(_T&& _v) {
 			using U = std::decay_t<_T>;
 
-			if constexpr (std::is_same_v<U, char>) {
+			if constexpr(std::is_same_v<U, char>) {
 				__value = std::string(1, _v);
 			}
-			else if constexpr (std::is_constructible_v<std::string, U>) {
+			else if constexpr(std::is_constructible_v<std::string, U>) {
 				__value = std::string(_v);
 			}
-			else if constexpr (std::constructible_from<Variant, U>) {
+			else if constexpr(std::constructible_from<Variant, U>) {
 				__value = std::forward<_T>(_v);
 			}
 		}
@@ -40,19 +40,19 @@ namespace slim {
 			return std::visit([](auto&& _v)-> bool {
 				using _T = std::decay_t<decltype(_v)>;
 
-				if constexpr (std::is_same_v<_T, std::monostate>) {
+				if constexpr(std::is_same_v<_T, std::monostate>) {
 					return false;
 				}
-				else if constexpr (std::is_same_v<_T, bool>) {
+				else if constexpr(std::is_same_v<_T, bool>) {
 					return _v;
 				}
-				else if constexpr (std::is_arithmetic_v<_T>) {
+				else if constexpr(std::is_arithmetic_v<_T>) {
 					return _v != 0;
 				}
-				else if constexpr (std::is_same_v<_T, std::string>) {
+				else if constexpr(std::is_same_v<_T, std::string>) {
 					return !_v.empty();
 				}
-				else if constexpr (std::is_same_v<_T, slim_storage_container>) {
+				else if constexpr(std::is_same_v<_T, slim_storage_container>) {
 					return !_v.empty();
 				}
 				else {
@@ -76,27 +76,27 @@ namespace slim {
 			return std::visit([&](auto&& _v) -> bool {
 				using _V = std::decay_t<decltype(_v)>;
 
-				if constexpr (std::is_same_v<_V, std::string>) {
-					if constexpr (std::is_same_v<U, std::string>) {
+				if constexpr(std::is_same_v<_V, std::string>) {
+					if constexpr(std::is_same_v<U, std::string>) {
 						return _v == _rhs;
 					}
-					else if constexpr (std::is_constructible_v<std::string_view, U>) {
+					else if constexpr(std::is_constructible_v<std::string_view, U>) {
 						return _v == std::string_view(_rhs);
 					}
 					else {
 						return false;
 					}
 				}
-				else if constexpr (std::is_integral_v<_V> && std::is_integral_v<U>) {
+				else if constexpr(std::is_integral_v<_V> && std::is_integral_v<U>) {
 					return static_cast<int64_t>(_v) == static_cast<int64_t>(_rhs);
 				}
-				else if constexpr (std::is_floating_point_v<_V> && std::is_floating_point_v<U>) {
+				else if constexpr(std::is_floating_point_v<_V> && std::is_floating_point_v<U>) {
 					return static_cast<double>(_v) == static_cast<double>(_rhs);
 				}
-				else if constexpr ((std::is_arithmetic_v<_V> && std::is_arithmetic_v<U>)) {
+				else if constexpr((std::is_arithmetic_v<_V> && std::is_arithmetic_v<U>)) {
 					return static_cast<double>(_v) == static_cast<double>(_rhs);
 				}
-				else if constexpr (std::is_same_v<_V, U>) {
+				else if constexpr(std::is_same_v<_V, U>) {
 					return _v == _rhs;
 				}
 				else {
@@ -112,27 +112,27 @@ namespace slim {
 			return std::visit([&](auto&& _v) -> bool {
 				using _V = std::decay_t<decltype(_v)>;
 
-				if constexpr (std::is_same_v<_V, std::string>) {
-					if constexpr (std::is_same_v<U, std::string>) {
+				if constexpr(std::is_same_v<_V, std::string>) {
+					if constexpr(std::is_same_v<U, std::string>) {
 						return _v != _rhs;
 					}
-					else if constexpr (std::is_constructible_v<std::string_view, U>) {
+					else if constexpr(std::is_constructible_v<std::string_view, U>) {
 						return _v != std::string_view(_rhs);
 					}
 					else {
 						return false;
 					}
 				}
-				else if constexpr (std::is_integral_v<_V> && std::is_integral_v<U>) {
+				else if constexpr(std::is_integral_v<_V> && std::is_integral_v<U>) {
 					return static_cast<int64_t>(_v) != static_cast<int64_t>(_rhs);
 				}
-				else if constexpr (std::is_floating_point_v<_V> && std::is_floating_point_v<U>) {
+				else if constexpr(std::is_floating_point_v<_V> && std::is_floating_point_v<U>) {
 					return static_cast<double>(_v) != static_cast<double>(_rhs);
 				}
-				else if constexpr ((std::is_arithmetic_v<_V> && std::is_arithmetic_v<U>)) {
+				else if constexpr((std::is_arithmetic_v<_V> && std::is_arithmetic_v<U>)) {
 					return static_cast<double>(_v) != static_cast<double>(_rhs);
 				}
-				else if constexpr (std::is_same_v<_V, U>) {
+				else if constexpr(std::is_same_v<_V, U>) {
 					return _v != _rhs;
 				}
 				else {
@@ -216,40 +216,48 @@ namespace slim {
 		double get_as_double() const {
 			return std::visit([](auto&& _v) -> double {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>)
+				if constexpr(std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>) {
 					return static_cast<double>(_v);
-				else
+				}
+				else {
 					throw std::bad_variant_access{};
+				}
 			}, __value);
 		}
 
 		long double get_as_float() const {
 			return std::visit([](auto&& _v) -> long double {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_floating_point_v<_T>)
+				if constexpr(std::is_floating_point_v<_T>) {
 					return static_cast<long double>(_v);
-				else
+				}
+				else {
 					throw std::bad_variant_access{};
+				}
 			}, __value);
 		}
 
 		int64_t get_as_int64() const {
 			return std::visit([](auto&& _v) -> int64_t {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+				if constexpr(std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>) {
 					return static_cast<int64_t>(_v);
-				else
+				}
+				else {
 					throw std::bad_variant_access{};
+				}
 			}, __value);
 		}
 
 		uint64_t get_as_uint64() const {
 			return std::visit([](auto&& _v) -> uint64_t {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+				if constexpr(std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>) {
 					return static_cast<uint64_t>(_v);
-				else
+				}
+				else {
 					throw std::bad_variant_access{};
+				}
 			}, __value);
 		}
 
@@ -266,22 +274,22 @@ namespace slim {
 			return std::visit([](auto&& _v) -> std::string {
 				using _T = std::decay_t<decltype(_v)>;
 
-				if constexpr (std::is_same_v<_T, std::monostate>) {
+				if constexpr(std::is_same_v<_T, std::monostate>) {
 					return "";
 				}
-				else if constexpr (std::is_same_v<_T, bool>) {
+				else if constexpr(std::is_same_v<_T, bool>) {
 					return _v ? "true" : "false";
 				}
-				else if constexpr (std::is_integral_v<_T>) {
+				else if constexpr(std::is_integral_v<_T>) {
 					return std::to_string(_v);
 				}
-				else if constexpr (std::is_floating_point_v<_T>) {
+				else if constexpr(std::is_floating_point_v<_T>) {
 					return std::to_string(_v);
 				}
-				else if constexpr (std::is_same_v<_T, std::string>) {
+				else if constexpr(std::is_same_v<_T, std::string>) {
 					return _v;
 				}
-				else if constexpr (std::is_same_v<_T, slim_storage_container>) {
+				else if constexpr(std::is_same_v<_T, slim_storage_container>) {
 					return std::string(_v.begin(), _v.end());
 				}
 				else {
@@ -294,20 +302,25 @@ namespace slim {
 		// Return std::nullopt if the stored type doesn't match.
 
 		std::optional<bool> try_bool() const {
-			if (is<bool>()) return get<bool>();
+			if(is<bool>()) {
+				return get<bool>();
+			}
 			return std::nullopt;
 		}
 
 		std::optional<slim_coordinates> try_coordinates() const {
-			if (is<slim_coordinates>()) return get<slim_coordinates>();
+			if(is<slim_coordinates>()) {
+				return get<slim_coordinates>();
+			}
 			return std::nullopt;
 		}
 
 		std::optional<double> try_double() const {
 			return std::visit([](auto&& _v) -> std::optional<double> {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>)
+				if constexpr(std::is_arithmetic_v<_T> && !std::is_same_v<_T, std::monostate>) {
 					return static_cast<double>(_v);
+				}
 				return std::nullopt;
 			}, __value);
 		}
@@ -315,19 +328,24 @@ namespace slim {
 		std::optional<int64_t> try_int64() const {
 			return std::visit([](auto&& _v) -> std::optional<int64_t> {
 				using _T = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>)
+				if constexpr(std::is_integral_v<_T> && !std::is_same_v<_T, std::monostate>) {
 					return static_cast<int64_t>(_v);
+				}
 				return std::nullopt;
 			}, __value);
 		}
 
 		std::optional<slim_storage_container> try_storage_container() const {
-			if (is<slim_storage_container>()) return get<slim_storage_container>();
+			if(is<slim_storage_container>()) {
+				return get<slim_storage_container>();
+			}
 			return std::nullopt;
 		}
 
 		std::optional<std::string> try_string() const {
-			if (is<std::string>()) return get<std::string>();
+			if(is<std::string>()) {
+				return get<std::string>();
+			}
 			return std::nullopt;
 		}
 
@@ -338,20 +356,26 @@ namespace slim {
 		_T value_or(_T _fallback) const {
 			return std::visit([&](auto&& _v) -> _T {
 				using _V = std::decay_t<decltype(_v)>;
-				if constexpr (std::is_convertible_v<_V, _T>)
+				if constexpr(std::is_convertible_v<_V, _T>) {
 					return static_cast<_T>(_v);
-				else
+				}
+				else {
 					return _fallback;
+				}
 			}, __value);
 		}
 
 		std::string value_or(std::string _fallback) const {
-			if (is<std::string>()) return get<std::string>();
+			if(is<std::string>()) {
+				return get<std::string>();
+			}
 			return _fallback;
 		}
 
 		std::string value_or(const char* _fallback) const {
-			if (is<std::string>()) return get<std::string>();
+			if(is<std::string>()) {
+				return get<std::string>();
+			}
 			return std::string(_fallback);
 		}
 
@@ -516,7 +540,7 @@ namespace slim {
 		void set(std::string_view _key, _T&& _value) {
 			using U = std::decay_t<_T>;
 
-			if constexpr (std::is_same_v<U, std::string_view>) {
+			if constexpr(std::is_same_v<U, std::string_view>) {
 				__map.emplace(std::string(_key), AnyValue(std::string(_value)));
 			}
 			else {
