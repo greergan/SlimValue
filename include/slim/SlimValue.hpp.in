@@ -10,12 +10,14 @@
 #include <type_traits>
 #include <unordered_map>
 #include <variant>
+#include <vector>
 
 #define SLIMVALUE_VERSION "@SLIMVALUE_VERSION@"
 #define SLIMVALUE_GIT_HASH "@SLIMVALUE_GIT_HASH@"
 
 namespace slim {
 	using slim_coordinates = std::pair<int, int>;
+	using slim_storage_container = std::vector<uint8_t>;
 	struct AnyValue {
 		AnyValue() = default;
 
@@ -48,6 +50,9 @@ namespace slim {
 					return _v != 0;
 				}
 				else if constexpr (std::is_same_v<_T, std::string>) {
+					return !_v.empty();
+				}
+				else if constexpr (std::is_same_v<_T, slim_storage_container>) {
 					return !_v.empty();
 				}
 				else {
@@ -180,6 +185,14 @@ namespace slim {
 			return get<long long>();
 		}
 
+		slim_storage_container& get_storage_container() {
+			return get<slim_storage_container>();
+		}
+
+		const slim_storage_container& get_storage_container() const {
+			return get<slim_storage_container>();
+		}
+
 		const std::string& get_string() const {
 			return get<std::string>();
 		}
@@ -268,6 +281,9 @@ namespace slim {
 				else if constexpr (std::is_same_v<_T, std::string>) {
 					return _v;
 				}
+				else if constexpr (std::is_same_v<_T, slim_storage_container>) {
+					return std::string(_v.begin(), _v.end());
+				}
 				else {
 					return "";
 				}
@@ -303,6 +319,11 @@ namespace slim {
 					return static_cast<int64_t>(_v);
 				return std::nullopt;
 			}, __value);
+		}
+
+		std::optional<slim_storage_container> try_storage_container() const {
+			if (is<slim_storage_container>()) return get<slim_storage_container>();
+			return std::nullopt;
 		}
 
 		std::optional<std::string> try_string() const {
@@ -348,6 +369,7 @@ namespace slim {
 				double,
 				long double,
 				std::string,
+				slim_storage_container,
 				slim_coordinates
 			>;
 			Variant __value;
@@ -673,6 +695,14 @@ namespace slim {
 			return (*__multi_maps)[std::string(_key)];
 		}
 
+		slim_storage_container& get_storage_container() {
+			return __value.get_storage_container();
+		}
+
+		const slim_storage_container& get_storage_container() const {
+			return __value.get_storage_container();
+		}
+
 		const std::string& get_string() const {
 			return __value.get_string();
 		}
@@ -754,6 +784,10 @@ namespace slim {
 
 		std::optional<int64_t> try_int64() const {
 			return __value.try_int64();
+		}
+
+		std::optional<slim_storage_container> try_storage_container() const {
+			return __value.try_storage_container();
 		}
 
 		std::optional<std::string> try_string() const {
