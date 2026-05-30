@@ -405,12 +405,6 @@ namespace slim {
 		ErrorInfo(std::string_view _message) : __message(_message) {}
 		ErrorInfo(int _code, std::string_view _message) : __code(_code), __message(_message) {}
 
-		template <typename _T>
-		ErrorInfo(_T&& _message): __message(std::forward<_T>(_message)) {}
-
-		template <typename _T>
-		ErrorInfo(int _code, _T&& _message): __code(_code), __message(std::forward<_T>(_message)) {}
-
 		int code() const {
 			return __code.value_or(-1);
 		}
@@ -770,6 +764,18 @@ namespace slim {
 		template <typename _T>
 		bool is() const {
 			return __value.is<_T>();
+		}
+
+		void set_error(const int _code) {
+			__error = ErrorInfo(_code);
+		}
+
+		void set_error(std::string_view _message) {
+			__error = ErrorInfo(_message);
+		}
+
+		void set_error(const int _code, std::string_view _message) {
+			__error = ErrorInfo(_code, _message);
 		}
 
 		void set_error(const ErrorInfo& _error) {
