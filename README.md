@@ -16,11 +16,11 @@ A single-header C++20 value container library providing type-safe storage, error
 
 `AnyValue` (and by extension `SlimValue`) can hold any of the following:
 
-`bool`, `int`, `long`, `long long`, `unsigned`, `unsigned long`, `unsigned long long`, `float`, `double`, `long double`, `char`, `std::string`, `slim_coordinates`
+`bool`, `int`, `long`, `long long`, `unsigned`, `unsigned long`, `unsigned long long`, `float`, `double`, `long double`, `std::string`, `slim_storage_container`, `slim_coordinates`
 
-`std::string_view` and string literals are automatically converted to `std::string` on construction. `std::monostate` represents the empty/unset state.
+`char`, `std::string_view`, and string literals are automatically converted to `std::string` on construction — `char` is not stored as a distinct type. `std::monostate` represents the empty/unset state.
 
-`slim_coordinates` is an alias for `std::pair<int, int>`.
+`slim_coordinates` is an alias for `std::pair<int, int>`. `slim_storage_container` is an alias for `std::vector<uint8_t>`.
 
 ## Usage
 
@@ -175,10 +175,11 @@ unsigned long long get_unsigned_long_long() const;
 float         get_float()              const;
 double        get_double()             const;
 long double   get_long_double()        const;
-char          get_char()               const;
-const std::string& get_string()        const;
-slim_coordinates   get_coordinates()   const;
-template <typename T> T& get();
+const std::string&          get_string()           const;  // char input is stored as string
+slim_storage_container&     get_storage_container();
+const slim_storage_container& get_storage_container() const;
+slim_coordinates            get_coordinates()       const;
+template <typename T> T&   get();
 ```
 
 #### Cross-type numeric getters *(throw on mismatch)*
@@ -191,11 +192,12 @@ long double get_as_float()  const;
 
 #### Non-throwing getters
 ```cpp
-std::optional<bool>             try_bool()        const;
-std::optional<int64_t>          try_int64()       const;
-std::optional<double>           try_double()      const;
-std::optional<std::string>      try_string()      const;
-std::optional<slim_coordinates> try_coordinates() const;
+std::optional<bool>                    try_bool()             const;
+std::optional<int64_t>                 try_int64()            const;
+std::optional<double>                  try_double()           const;
+std::optional<std::string>             try_string()           const;
+std::optional<slim_storage_container>  try_storage_container() const;
+std::optional<slim_coordinates>        try_coordinates()      const;
 ```
 
 #### Fallback & stringify
@@ -264,7 +266,11 @@ All `AnyValue` getters are forwarded. Additional members:
 
 ```cpp
 // Error
-void             set_error(ErrorInfo error);
+void             set_error(int code);
+void             set_error(std::string_view message);
+void             set_error(int code, std::string_view message);
+void             set_error(const ErrorInfo& error);
+void             set_error(ErrorInfo&& error);
 bool             has_error()           const;
 const ErrorInfo& get_error()           const;
 
