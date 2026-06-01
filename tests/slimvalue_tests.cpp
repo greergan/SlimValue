@@ -64,3 +64,10 @@ TEST_CASE("SlimValue set_error overwrite replaces previous error") {
 	REQUIRE(v.get_error().code() == 2);
 	REQUIRE(v.get_error().message() == "second");
 }
+
+TEST_CASE("SlimValue as error") {
+	slim::SlimValue v = slim::ErrorInfo{500, "internal error"};
+	REQUIRE_FALSE(v.has_value());
+	REQUIRE(v.get_error().code() == 500);
+	REQUIRE(v.get_error().message() == "internal error");
+}
