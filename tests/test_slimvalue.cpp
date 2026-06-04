@@ -427,16 +427,6 @@ TEST_CASE("SlimValue move assignment", "[SlimValue][assignment]") {
     REQUIRE(b.get_string() == "moved");
 }
 
-// ============================================================
-//  SlimValue — set_value / set_error
-// ============================================================
-
-TEST_CASE("SlimValue set_value replaces stored value", "[SlimValue][setters]") {
-    SlimValue sv(42);
-    sv.set_value(AnyValue(99));
-    REQUIRE(sv.get_int() == 99);
-}
-
 TEST_CASE("SlimValue set_error attaches an error", "[SlimValue][setters]") {
     SlimValue sv(42);
     sv.set_error(ErrorInfo(1, "bad"));

@@ -766,32 +766,29 @@ namespace slim {
 			return __value.is<_T>();
 		}
 
-		void set_error(const int _code) {
+		SlimValue& set_error(const int _code) {
 			__error = ErrorInfo(_code);
+			return *this;
 		}
 
-		void set_error(std::string_view _message) {
+		SlimValue& set_error(std::string_view _message) {
 			__error = ErrorInfo(_message);
+			return *this;
 		}
 
-		void set_error(const int _code, std::string_view _message) {
+		SlimValue& set_error(const int _code, std::string_view _message) {
 			__error = ErrorInfo(_code, _message);
+			return *this;
 		}
 
-		void set_error(const ErrorInfo& _error) {
+		SlimValue& set_error(const ErrorInfo& _error) {
 			__error = _error;
+			return *this;
 		}
 
-		void set_error(ErrorInfo&& _error) {
+		SlimValue& set_error(ErrorInfo&& _error) {
 			__error = std::move(_error);
-		}
-
-		void set_value(const AnyValue& _value) {
-			__value = _value;
-		}
-
-		void set_value(AnyValue&& _value) {
-			__value = std::move(_value);
+			return *this;
 		}
 
 		std::string to_string() const {
